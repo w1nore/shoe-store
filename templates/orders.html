@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Заказы - ООО "Обувь"{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <header class="main-header">
+        <div class="header-left">
+            <img src="{{ url_for('static', filename='images/Icon.png') }}" alt="Логотип" class="header-logo">
+            <h1>Список заказов</h1>
+        </div>
+        <div class="header-right">
+            <span class="user-info">{{ session.user_name }} ({{ session.role }})</span>
+            <div class="header-buttons">
+                <a href="{{ url_for('products') }}" class="btn btn-back">Назад к товарам</a>
+                {% if session.role == 'Администратор' %}
+                    <a href="{{ url_for('add_order') }}" class="btn btn-add">Добавить заказ</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="btn btn-logout">Выход</a>
+            </div>
+        </div>
+    </header>
+    
+    <div class="content-area">
+        <div class="table-container">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Номер заказа</th>
+                        <th>Состав заказа</th>
+                        <th>Дата заказа</th>
+                        <th>Дата доставки</th>
+                        <th>Пункт выдачи</th>
+                        <th>ФИО клиента</th>
+                        <th>Код для получения</th>
+                        <th>Статус</th>
+                        {% if session.role == 'Администратор' %}
+                            <th>Действия</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order_data in orders %}
+                        {% set order = order_data.order %}
+                        {% set order_items_list = order_data.order_items %}
+                        <tr>
+                            <td>{{ order.order_code }}</td>
+                            <td class="order-items-cell">
+                                {% for order_item in order_items_list %}
+                                    <div class="order-item">
+                                        {{ order_item.product_article }}, {{ order_item.quantity }} шт.
+                                    </div>
+                                {% endfor %}
+                            </td>
+                            <td>{{ order.order_date }}</td>
+                            <td>{{ order.delivery_date }}</td>
+                            <td>{{ order.pickup_address }}</td>
+                            <td>{{ order.user_name }}</td>
+                            <td>{{ order.receive_code }}</td>
+                            <td>
+                                <span class="status-badge status-{{ order.status_name.lower() }}">
+                                    {{ order.status_name }}
+                                </span>
+                            </td>
+                            {% if session.role == 'Администратор' %}
+                                <td class="actions-cell">
+                                    <a href="{{ url_for('edit_order', id=order.id) }}" class="btn btn-edit">Редактировать</a>
+                                    <form method="POST" action="{{ url_for('delete_order', id=order.id) }}" 
+                                          style="display: inline;" 
+                                          onsubmit="return confirm('Вы уверены, что хотите удалить этот заказ?');">
+                                        <button type="submit" class="btn btn-delete">Удалить</button>
+                                    </form>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

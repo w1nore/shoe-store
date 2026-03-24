@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}{% if order %}Редактирование заказа{% else %}Добавление заказа{% endif %} - ООО "Обувь"{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <header class="main-header">
+        <div class="header-left">
+            <img src="{{ url_for('static', filename='images/Icon.png') }}" alt="Логотип" class="header-logo">
+            <h1>{% if order %}Редактирование заказа{% else %}Добавление заказа{% endif %}</h1>
+        </div>
+        <div class="header-right">
+            <span class="user-info">{{ session.user_name }} ({{ session.role }})</span>
+            <div class="header-buttons">
+                <a href="{{ url_for('orders') }}" class="btn btn-back">Назад</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-logout">Выход</a>
+            </div>
+        </div>
+    </header>
+    
+    <div class="content-area">
+        <div class="form-container">
+            <form method="POST" class="order-form">
+                <div class="form-group">
+                    <label for="order_code">Артикул заказа:</label>
+                    <input type="text" id="order_code" name="order_code" required 
+                           value="{{ order.order_code if order else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="status_id">Статус заказа:</label>
+                    <select id="status_id" name="status_id" required>
+                        {% for status in statuses %}
+                            <option value="{{ status.id }}" 
+                                    {% if order and order.status_id == status.id %}selected{% endif %}>
+                                {{ status.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="user_id">Клиент:</label>
+                    <select id="user_id" name="user_id" required>
+                        {% for user in users %}
+                            <option value="{{ user.id }}" 
+                                    {% if order and order.user_id == user.id %}selected{% endif %}>
+                                {{ user.full_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pickup_point_id">Адрес пункта выдачи:</label>
+                    <select id="pickup_point_id" name="pickup_point_id" required>
+                        {% for point in pickup_points %}
+                            <option value="{{ point.id }}" 
+                                    {% if order and order.pickup_point_id == point.id %}selected{% endif %}>
+                                {{ point.address }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="order_date">Дата заказа:</label>
+                        <input type="date" id="order_date" name="order_date" required 
+                               value="{{ order.order_date if order else '' }}">
+                    </div>
+                    
+                    <div class="form-group half">
+                        <label for="delivery_date">Дата выдачи:</label>
+                        <input type="date" id="delivery_date" name="delivery_date" 
+                               value="{{ order.delivery_date if order else '' }}">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="receive_code">Код для получения:</label>
+                    <input type="text" id="receive_code" name="receive_code" required 
+                           value="{{ order.receive_code if order else receive_code }}"
+                           maxlength="3" pattern="\d{3}">
+                    <small class="hint">Трехзначный числовой код</small>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-save">
+                        {% if order %}Сохранить изменения{% else %}Добавить заказ{% endif %}
+                    </button>
+                    <a href="{{ url_for('orders') }}" class="btn btn-cancel">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Валидация формы
+    document.querySelector('.order-form').addEventListener('submit', function(e) {
+        const receiveCode = document.getElementById('receive_code').value;
+        
+        if (!/^\d{3}$/.test(receiveCode)) {
+            alert('Код для получения должен состоять из 3 цифр');
+            e.preventDefault();
+            return;
+        }
+    });
+</script>
+{% endblock %}

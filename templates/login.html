@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Вход - ООО "Обувь"{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-box">
+        <div class="logo-section">
+            <img src="{{ url_for('static', filename='images/Icon.png') }}" alt="Логотип" class="logo">
+            <h1>ООО "Обувь"</h1>
+        </div>
+        
+        <form method="POST" action="{{ url_for('login') }}" class="login-form">
+            <div class="form-group">
+                <label for="login">Логин:</label>
+                <input type="text" id="login" name="login" required placeholder="Введите логин">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" name="password" required placeholder="Введите пароль">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Войти</button>
+        </form>
+        
+        <div class="guest-link">
+            <a href="{{ url_for('guest') }}" class="btn btn-secondary">Войти как гость</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
